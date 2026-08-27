@@ -4,8 +4,8 @@
 # =============================================================================
 #
 #        FILE: main.py
-#      AUTHOR: Mai Tan Duc
-#       EMAIL: ducmai.network@gmail.com
+#      AUTHOR: Tan Duc Mai
+#       EMAIL: henryfromvietnam@gmail.com
 #        DATE: 2021-10-21
 # DESCRIPTION: Use Caesar Cipher technique to encrypt or decrypt an
 #              inputted message.
