@@ -9,8 +9,6 @@
 #        DATE: 2021-10-21
 # DESCRIPTION: Use Caesar Cipher technique to encrypt or decrypt an
 #              inputted message.
-#   I hereby declare that I completed this work without any improper help
-#   from a third party and without using any aids other than those cited.
 #
 # =============================================================================
 
