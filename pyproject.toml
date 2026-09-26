@@ -1,10 +1,24 @@
 [project]
-name = "caesar-cipher-cryptography"
+name = "ciphershift"
 version = "1.0.0"
 description = "Encrypt or decrypt a message using the Caesar Cipher technique over the printable ASCII character set."
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [{ name = "Mai Tan Duc", email = "ducmai.network@gmail.com" }]
+dependencies = [
+    "icontract==2.7.3",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.3.5",
+    "pytest-cov==6.0.0",
+    "ruff==0.9.6",
+    "mypy==1.9.0",
+    "bandit==1.8.3",
+    "pip-audit==2.7.3",
+    "pre-commit==3.7.0",
+]
 
 [tool.ruff]
 line-length = 88
@@ -16,3 +30,16 @@ select = ["F", "E9", "B", "SIM", "RUF"]
 [tool.pytest.ini_options]
 addopts = "--cov=main --cov-report=term-missing"
 testpaths = ["tests"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+disallow_incomplete_defs = false

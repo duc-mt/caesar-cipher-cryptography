@@ -1,3 +1,11 @@
+# CipherShift
+
+[![CI](https://github.com/maitanduc/ciphershift/actions/workflows/ci.yml/badge.svg)](https://github.com/maitanduc/ciphershift/actions/workflows/ci.yml)
+[![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+[![Checked with mypy](https://img.shields.io/badge/mypy-checked-blue)](https://mypy-lang.org/)
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 # Table of Contents
@@ -241,7 +249,7 @@ Key (offset): 50. Keep this separate from the ciphertext - anyone with both can 
 7. Quit
 
 Enter an option (1-7): 4
-Enter the offset (key) (32-126) [Enter for 50]: 
+Enter the offset (key) (32-126) [Enter for 50]:
 Your message was successfully decrypted.
 Your message is: 'The rabbit has sprung.'.
 

@@ -45,7 +45,7 @@ ALPHABET_SIZE = ASCII_MAX - ASCII_MIN + 1  # 95
 # these, so the logic is only implemented (and tested) once.
 @icontract.ensure(lambda message: isinstance(message, str))
 @icontract.ensure(lambda result: isinstance(result, bool))
-def is_valid_message(message):
+def is_valid_message(message: str) -> bool:
     """Check every character in `message` is within the printable
     ASCII range this cipher is defined over: 32 (Space) to 126 (~).
 
@@ -63,7 +63,7 @@ def is_valid_message(message):
 
 
 @icontract.ensure(lambda result: isinstance(result, int))
-def random_offset():
+def random_offset() -> int:
     """Generate a random offset in [32, 126] using a CSPRNG.
 
     NOTE: random.randint() used to be used for this. It's a Mersenne
@@ -80,7 +80,7 @@ def random_offset():
 
 @icontract.require(lambda message: is_valid_message(message))
 @icontract.ensure(lambda result: isinstance(result, str))
-def encrypt(message, offset):
+def encrypt(message: str, offset: int) -> str:
     """Encrypt `message` by shifting every character forward by
     `offset`, wrapping around within the printable ASCII range.
 
@@ -105,7 +105,7 @@ def encrypt(message, offset):
         option_encrypt()'s docstring for why keeping them separate
         matters.
     """
-    result = ''
+    result = ""
     for char in message:
         value = ord(char) + offset
         while value > ASCII_MAX:
@@ -115,7 +115,7 @@ def encrypt(message, offset):
 
 
 @icontract.ensure(lambda result: isinstance(result, str))
-def decrypt(ciphertext, offset):
+def decrypt(ciphertext: str, offset: int) -> str:
     """Decrypt `ciphertext` by shifting every character back by
     `offset`, wrapping around within the printable ASCII range.
 
@@ -134,7 +134,7 @@ def decrypt(ciphertext, offset):
         The recovered plaintext - correct only if `offset` is the
         actual key that was used to encrypt this ciphertext.
     """
-    result = ''
+    result = ""
     for char in ciphertext:
         value = ord(char) - offset
         while value < ASCII_MIN:
@@ -144,7 +144,7 @@ def decrypt(ciphertext, offset):
 
 
 @icontract.ensure(lambda result: len(result) == ALPHABET_SIZE)
-def brute_force(ciphertext):
+def brute_force(ciphertext: str) -> list[tuple[int, str]]:
     """Try every one of the 95 possible offsets against `ciphertext`.
 
     This is the classic demonstration of why a Caesar cipher isn't
@@ -169,7 +169,7 @@ def brute_force(ciphertext):
 
 
 # -------------------------- File Helpers (shared) -----------------------------
-def read_message_file(path):
+def read_message_file(path: str) -> str:
     """Read a message from a text file, for shared use by both the
     interactive menu and the CLI mode.
 
@@ -197,14 +197,14 @@ def read_message_file(path):
     UnicodeDecodeError
         If the file isn't valid UTF-8 text.
     """
-    with open(path, encoding='utf-8') as f:
+    with open(path, encoding="utf-8") as f:
         content = f.read()
-    if content.endswith('\n'):
+    if content.endswith("\n"):
         content = content[:-1]
     return content
 
 
-def write_message_file(path, content):
+def write_message_file(path: str, content: str) -> None:
     """Write `content` to a text file, for shared use by both the
     interactive menu and the CLI mode.
 
@@ -220,7 +220,7 @@ def write_message_file(path, content):
     OSError
         If the file can't be written.
     """
-    with open(path, 'w', encoding='utf-8') as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write(content)
 
 
@@ -229,25 +229,25 @@ NUM_MENU_OPTIONS = 7
 
 
 @icontract.ensure(lambda result: result is None)
-def menu_driven_program():
+def menu_driven_program() -> None:
     print(
-        '-------------------',
-        '     MAIN MENU',
-        '-------------------',
-        '1. Enter Message',
-        '2. Load Message from File',
-        '3. Encrypt Message',
-        '4. Decrypt Message',
-        '5. Brute-force Decrypt (try every offset)',
-        '6. Save Message to File',
-        '7. Quit',
-        sep='\n',
-        end='\n\n',
+        "-------------------",
+        "     MAIN MENU",
+        "-------------------",
+        "1. Enter Message",
+        "2. Load Message from File",
+        "3. Encrypt Message",
+        "4. Decrypt Message",
+        "5. Brute-force Decrypt (try every offset)",
+        "6. Save Message to File",
+        "7. Quit",
+        sep="\n",
+        end="\n\n",
     )
 
 
 @icontract.ensure(lambda result: isinstance(result, int))
-def validate_option():
+def validate_option() -> int:
     """Prompt the user for a number and validate it.
 
     Returns
@@ -259,19 +259,21 @@ def validate_option():
 
     while option is None or option not in range(1, NUM_MENU_OPTIONS + 1):
         try:
-            option = float(input(f'Enter an option (1-{NUM_MENU_OPTIONS}): '))
+            option = float(input(f"Enter an option (1-{NUM_MENU_OPTIONS}): "))
         except ValueError as e:
-            print(f'Invalid choice: {e}.')
+            print(f"Invalid choice: {e}.")
         else:
             if option not in range(1, NUM_MENU_OPTIONS + 1):
-                print(f'Invalid choice: option should be between 1 and '
-                      f'{NUM_MENU_OPTIONS}.')
+                print(
+                    f"Invalid choice: option should be between 1 and "
+                    f"{NUM_MENU_OPTIONS}."
+                )
 
     return int(option)
 
 
 @icontract.ensure(lambda result: isinstance(result, str))
-def option_enter_message():
+def option_enter_message() -> str:
     """Prompt for and display the user message to the screen.
 
     Returns
@@ -279,9 +281,9 @@ def option_enter_message():
     str
         The message received from the user.
     """
-    message = input('Please enter a new message: ')
+    message = input("Please enter a new message: ")
 
-    if message == '':
+    if message == "":
         print()
         return message
 
@@ -297,15 +299,17 @@ def option_enter_message():
     # user can see and fix them, replaces silent data corruption with
     # a clear error.
     if not is_valid_message(message):
-        print('Error: message must only contain printable ASCII '
-              'characters (Space to ~).', end='\n\n')
-        return ''
+        print(
+            "Error: message must only contain printable ASCII characters (Space to ~).",
+            end="\n\n",
+        )
+        return ""
 
-    print(f'Your message is: {message!r}.', end='\n\n')
+    print(f"Your message is: {message!r}.", end="\n\n")
     return message
 
 
-def option_load_file():
+def option_load_file() -> str:
     """Prompt for a file path and load a message from it.
 
     Returns
@@ -314,28 +318,30 @@ def option_load_file():
         The loaded message, or '' if the file couldn't be read or
         contained invalid characters.
     """
-    path = input('Enter the file path to load the message from: ').strip()
+    path = input("Enter the file path to load the message from: ").strip()
 
     try:
         content = read_message_file(path)
     except OSError as e:
-        print(f'Error: could not read {path!r}: {e}.', end='\n\n')
-        return ''
+        print(f"Error: could not read {path!r}: {e}.", end="\n\n")
+        return ""
     except UnicodeDecodeError:
-        print(f'Error: {path!r} is not a text file this cipher can read.',
-              end='\n\n')
-        return ''
+        print(f"Error: {path!r} is not a text file this cipher can read.", end="\n\n")
+        return ""
 
     if not is_valid_message(content):
-        print('Error: file contains characters outside the printable '
-              'ASCII range (Space to ~).', end='\n\n')
-        return ''
+        print(
+            "Error: file contains characters outside the printable "
+            "ASCII range (Space to ~).",
+            end="\n\n",
+        )
+        return ""
 
-    print(f'Loaded message from {path!r}: {content!r}.', end='\n\n')
+    print(f"Loaded message from {path!r}: {content!r}.", end="\n\n")
     return content
 
 
-def option_encrypt(message):
+def option_encrypt(message: str) -> tuple[str, int | None]:
     """Encrypt `message`, printing the ciphertext and the key
     (offset) as two clearly separate pieces of output.
 
@@ -358,37 +364,41 @@ def option_encrypt(message):
     tuple[str, int or None]
         (ciphertext, offset) - offset is None if message was empty.
     """
-    if message == '':
-        print('Error: Cannot encrypt an empty message.', end='\n\n')
+    if message == "":
+        print("Error: Cannot encrypt an empty message.", end="\n\n")
         return message, None
 
     raw = input(
-        f'Enter an offset ({ASCII_MIN}-{ASCII_MAX}), or press Enter for a '
-        'random one: '
+        f"Enter an offset ({ASCII_MIN}-{ASCII_MAX}), or press Enter for a random one: "
     ).strip()
-    if raw == '':
+    if raw == "":
         offset = random_offset()
     else:
         try:
             offset = int(raw)
         except ValueError:
-            print('Invalid offset - using a random one instead.')
+            print("Invalid offset - using a random one instead.")
             offset = random_offset()
         else:
             if not (ASCII_MIN <= offset <= ASCII_MAX):
-                print(f'Offset out of range ({ASCII_MIN}-{ASCII_MAX}) - '
-                      'using a random one instead.')
+                print(
+                    f"Offset out of range ({ASCII_MIN}-{ASCII_MAX}) - "
+                    "using a random one instead."
+                )
                 offset = random_offset()
 
     ciphertext = encrypt(message, offset)
-    print('Your message was successfully encrypted.')
-    print(f'Ciphertext: {ciphertext!r}.')
-    print(f'Key (offset): {offset}. Keep this separate from the '
-          'ciphertext - anyone with both can decrypt it.', end='\n\n')
+    print("Your message was successfully encrypted.")
+    print(f"Ciphertext: {ciphertext!r}.")
+    print(
+        f"Key (offset): {offset}. Keep this separate from the "
+        "ciphertext - anyone with both can decrypt it.",
+        end="\n\n",
+    )
     return ciphertext, offset
 
 
-def option_decrypt(ciphertext, known_offset=None):
+def option_decrypt(ciphertext: str, known_offset: int | None = None) -> str:
     """Decrypt `ciphertext` using an offset supplied by the user.
 
     Parameters
@@ -409,40 +419,41 @@ def option_decrypt(ciphertext, known_offset=None):
     str
         The decrypted message, or '' if ciphertext was empty.
     """
-    if ciphertext == '':
-        print('Error: Cannot decrypt an empty message.', end='\n\n')
+    if ciphertext == "":
+        print("Error: Cannot decrypt an empty message.", end="\n\n")
         return ciphertext
 
-    prompt = f'Enter the offset (key) ({ASCII_MIN}-{ASCII_MAX})'
+    prompt = f"Enter the offset (key) ({ASCII_MIN}-{ASCII_MAX})"
     if known_offset is not None:
-        prompt += f' [Enter for {known_offset}]'
-    prompt += ': '
+        prompt += f" [Enter for {known_offset}]"
+    prompt += ": "
 
     offset = None
     while offset is None:
         raw = input(prompt).strip()
-        if raw == '' and known_offset is not None:
+        if raw == "" and known_offset is not None:
             offset = known_offset
             break
         try:
             candidate = int(raw)
         except ValueError:
-            print(f'Invalid offset: must be a whole number between '
-                  f'{ASCII_MIN} and {ASCII_MAX}.')
+            print(
+                f"Invalid offset: must be a whole number between "
+                f"{ASCII_MIN} and {ASCII_MAX}."
+            )
             continue
         if not (ASCII_MIN <= candidate <= ASCII_MAX):
-            print(f'Invalid offset: must be between {ASCII_MIN} and '
-                  f'{ASCII_MAX}.')
+            print(f"Invalid offset: must be between {ASCII_MIN} and {ASCII_MAX}.")
             continue
         offset = candidate
 
     decrypted_message = decrypt(ciphertext, offset)
-    print('Your message was successfully decrypted.')
-    print(f'Your message is: {decrypted_message!r}.', end='\n\n')
+    print("Your message was successfully decrypted.")
+    print(f"Your message is: {decrypted_message!r}.", end="\n\n")
     return decrypted_message
 
 
-def option_brute_force(ciphertext):
+def option_brute_force(ciphertext: str) -> None:
     """Try every possible offset against `ciphertext` and print every
     candidate plaintext - the classic demonstration of why a Caesar
     cipher's tiny keyspace makes it insecure.
@@ -457,18 +468,21 @@ def option_brute_force(ciphertext):
     -------
     None
     """
-    if ciphertext == '':
-        print('Error: Cannot brute-force an empty message.', end='\n\n')
+    if ciphertext == "":
+        print("Error: Cannot brute-force an empty message.", end="\n\n")
         return
 
-    print(f'Trying all {ALPHABET_SIZE} possible offsets - this is exactly '
-          'why a Caesar cipher is not secure:', end='\n\n')
+    print(
+        f"Trying all {ALPHABET_SIZE} possible offsets - this is exactly "
+        "why a Caesar cipher is not secure:",
+        end="\n\n",
+    )
     for offset, candidate in brute_force(ciphertext):
-        print(f'  offset {offset:3d}: {candidate!r}')
+        print(f"  offset {offset:3d}: {candidate!r}")
     print()
 
 
-def option_save_file(message):
+def option_save_file(message: str) -> None:
     """Prompt for a file path and save `message` to it.
 
     Parameters
@@ -481,22 +495,22 @@ def option_save_file(message):
     -------
     None
     """
-    if message == '':
-        print('Error: There is no message to save yet.', end='\n\n')
+    if message == "":
+        print("Error: There is no message to save yet.", end="\n\n")
         return
 
-    path = input('Enter the file path to save the message to: ').strip()
+    path = input("Enter the file path to save the message to: ").strip()
 
     try:
         write_message_file(path, message)
     except OSError as e:
-        print(f'Error: could not write to {path!r}: {e}.', end='\n\n')
+        print(f"Error: could not write to {path!r}: {e}.", end="\n\n")
         return
 
-    print(f'Saved message to {path!r}.', end='\n\n')
+    print(f"Saved message to {path!r}.", end="\n\n")
 
 
-def run_interactive():
+def run_interactive() -> None:
     """Run the interactive, menu-driven session (the original
     behaviour of this program, extended with the new options above).
     """
@@ -505,7 +519,7 @@ def run_interactive():
 
     # Current working text - whatever was last entered, loaded,
     # encrypted, or decrypted.
-    message = ''
+    message = ""
     # The offset last used by option_encrypt(), offered as the
     # default the next time option_decrypt() runs - see its
     # docstring. Cleared whenever `message` stops being that exact
@@ -539,88 +553,90 @@ def run_interactive():
         option = validate_option()
 
     # Exit the loop, meaning option == NUM_MENU_OPTIONS (Quit):
-    if message != '':
-        print(f'Your message is: {message!r}.')
-    print('\nGoodbye')
+    if message != "":
+        print(f"Your message is: {message!r}.")
+    print("\nGoodbye")
 
 
 # ------------------------------ Non-Interactive CLI ---------------------------
-def build_arg_parser():
+def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description='Encrypt or decrypt a message using the Caesar Cipher '
-                     'technique over the printable ASCII character set '
-                     f'({ASCII_MIN}-{ASCII_MAX}). Run with no arguments for '
-                     'the interactive menu.',
+        description="Encrypt or decrypt a message using the Caesar Cipher "
+        "technique over the printable ASCII character set "
+        f"({ASCII_MIN}-{ASCII_MAX}). Run with no arguments for "
+        "the interactive menu.",
     )
     parser.add_argument(
-        '--mode', choices=['encrypt', 'decrypt', 'brute-force'],
-        help='Run once in this mode instead of the interactive menu.',
+        "--mode",
+        choices=["encrypt", "decrypt", "brute-force"],
+        help="Run once in this mode instead of the interactive menu.",
     )
 
     source = parser.add_mutually_exclusive_group()
-    source.add_argument('--message', help='The message to process.')
+    source.add_argument("--message", help="The message to process.")
     source.add_argument(
-        '--file', help='Read the message from this file instead of '
-                        '--message.',
+        "--file",
+        help="Read the message from this file instead of --message.",
     )
 
     parser.add_argument(
-        '--offset', type=int,
-        help=f'The offset (key), {ASCII_MIN}-{ASCII_MAX}. Required for '
-             '--mode decrypt; random if omitted for --mode encrypt; '
-             'ignored for --mode brute-force.',
+        "--offset",
+        type=int,
+        help=f"The offset (key), {ASCII_MIN}-{ASCII_MAX}. Required for "
+        "--mode decrypt; random if omitted for --mode encrypt; "
+        "ignored for --mode brute-force.",
     )
     parser.add_argument(
-        '--output', help='Write the result to this file instead of '
-                          'stdout. For --mode encrypt, the key is always '
-                          'printed separately (to stderr), never included '
-                          'in --output or stdout, so it never ends up '
-                          'mixed in with the ciphertext.',
+        "--output",
+        help="Write the result to this file instead of "
+        "stdout. For --mode encrypt, the key is always "
+        "printed separately (to stderr), never included "
+        "in --output or stdout, so it never ends up "
+        "mixed in with the ciphertext.",
     )
     return parser
 
 
-def run_cli(args, parser):
+def run_cli(args: argparse.Namespace, parser: argparse.ArgumentParser) -> int:
     """Run one CLI-mode operation and return a process exit code."""
     if args.file:
         try:
             text = read_message_file(args.file)
         except OSError as e:
-            parser.error(f'could not read {args.file!r}: {e}')
+            parser.error(f"could not read {args.file!r}: {e}")
         except UnicodeDecodeError:
-            parser.error(f'{args.file!r} is not a text file this cipher '
-                          'can read')
+            parser.error(f"{args.file!r} is not a text file this cipher can read")
     elif args.message is not None:
         text = args.message
     else:
-        parser.error('--message or --file is required with --mode')
+        parser.error("--message or --file is required with --mode")
 
-    if args.mode != 'brute-force' and not is_valid_message(text):
-        parser.error('message contains characters outside the printable '
-                      f'ASCII range ({ASCII_MIN}-{ASCII_MAX})')
+    if args.mode != "brute-force" and not is_valid_message(text):
+        parser.error(
+            "message contains characters outside the printable "
+            f"ASCII range ({ASCII_MIN}-{ASCII_MAX})"
+        )
 
-    if args.mode == 'encrypt':
+    if args.mode == "encrypt":
         offset = args.offset if args.offset is not None else random_offset()
         if not (ASCII_MIN <= offset <= ASCII_MAX):
-            parser.error(f'--offset must be between {ASCII_MIN} and '
-                          f'{ASCII_MAX}')
+            parser.error(f"--offset must be between {ASCII_MIN} and {ASCII_MAX}")
         result = encrypt(text, offset)
         # The key is always printed to stderr, separately from the
         # ciphertext on stdout/--output - see build_arg_parser()'s
         # --output help text for why.
-        print(f'Key (offset): {offset}', file=sys.stderr)
+        print(f"Key (offset): {offset}", file=sys.stderr)
 
-    elif args.mode == 'decrypt':
+    elif args.mode == "decrypt":
         if args.offset is None:
-            parser.error('--offset is required for --mode decrypt')
+            parser.error("--offset is required for --mode decrypt")
         if not (ASCII_MIN <= args.offset <= ASCII_MAX):
-            parser.error(f'--offset must be between {ASCII_MIN} and '
-                          f'{ASCII_MAX}')
+            parser.error(f"--offset must be between {ASCII_MIN} and {ASCII_MAX}")
         result = decrypt(text, args.offset)
 
     else:  # brute-force
-        result = '\n'.join(
-            f'offset {offset:3d}: {candidate!r}'
+        result = "\n".join(
+            f"offset {offset:3d}: {candidate!r}"
             for offset, candidate in brute_force(text)
         )
 
@@ -628,8 +644,8 @@ def run_cli(args, parser):
         try:
             write_message_file(args.output, result)
         except OSError as e:
-            parser.error(f'could not write to {args.output!r}: {e}')
-        print(f'Result written to {args.output!r}.', file=sys.stderr)
+            parser.error(f"could not write to {args.output!r}: {e}")
+        print(f"Result written to {args.output!r}.", file=sys.stderr)
     else:
         print(result)
 
@@ -637,7 +653,7 @@ def run_cli(args, parser):
 
 
 # ------------------------------- Main Function -------------------------------
-def main():
+def main() -> int:
     parser = build_arg_parser()
     args = parser.parse_args()
 
@@ -649,5 +665,5 @@ def main():
 
 
 # --------------------------- Call the Main Function --------------------------
-if __name__ == '__main__':
+if __name__ == "__main__":  # pragma: no cover
     sys.exit(main())
